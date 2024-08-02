@@ -1,39 +1,106 @@
-# create-svelte
+## Markdown Blog
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+Markdown files rendered as Svelte components with automatic Table of Content generation, syntax highlighting, and more
 
-## Creating a project
+## Takes this...
 
-If you're seeing this, you've probably already done this step. Congrats!
+![Screenshot](./screenshot-2.jpg)
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+## ...And turns it into this!
 
-# create a new project in my-app
-npm create svelte@latest my-app
+![Screenshot](./screenshot.jpg)
+![Screenshot](./screenshot-3.jpg)
+
+## Here is the code responsible for this magic:
+
+### _routes/api/posts/+server.ts_
+
+```
+async function getPosts() {
+	let posts: Post[] = [];
+
+	const paths = import.meta.glob('/src/posts/*.md', {
+		eager: true
+	});
+
+	for (const path in paths) {
+		const file = paths[path];
+		const slug = path.split('/').at(-1)?.replace('.md', '');
+
+		if (file && typeof file === 'object' && 'metadata' in file && slug) {
+			const metadata = file.metadata as Omit<Post, 'slug'>;
+			const post = { ...metadata, slug } satisfies Post;
+			if (post.published) posts.push(post);
+		}
+	}
+
+	posts = posts.sort(
+		(first, second) => new Date(second.date).getTime() - new Date(first.date).getTime()
+	);
+
+	return posts;
+}
+
+export const GET = async () => {
+	const posts = await getPosts();
+
+	return json(posts);
+};
 ```
 
-## Developing
+### _routes/[slug]/+page.ts_
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+```
+export const load: Load = async ({ params }) => {
+	try {
+		const post = await import(`../../posts/${params.slug}.md`);
 
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+		return {
+			content: post.default,
+			meta: post.metadata
+		};
+	} catch (e) {
+		console.log(e);
+		throw error(404, `Could not find ${params.slug}`);
+	}
+};
 ```
 
-## Building
+### And finally, the component that renders it out: _routes/[slug]/+page.svelte_
 
-To create a production version of your app:
+```
+<script lang="ts">
+	import { formatDate } from '$lib/utils.js';
 
-```bash
-npm run build
+	export let data;
+</script>
+
+<svelte:head>
+	<title>{data.meta.title}</title>
+	<meta property="og:type" content="article" />
+	<meta property="og:title" content={data.meta.title} />
+</svelte:head>
+
+<article>
+	<hgroup>
+		<h1>{data.meta.title}</h1>
+		<p>Published at: {formatDate(data.meta.date)}</p>
+	</hgroup>
+
+	<div class="tags">
+		{#each data.meta.categories as category}
+			<span class="surface-4">
+				&num;{category}
+			</span>
+		{/each}
+	</div>
+
+	<div class="prose">
+		<svelte:component this={data.content} />
+	</div>
+</article>
 ```
 
-You can preview the production build with `npm run preview`.
+---
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
-# markdown-blog
+## Live Preview: [View Project]('link')

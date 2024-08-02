@@ -2,6 +2,8 @@ import * as config from '$lib/config';
 import type { Post } from '$lib/types';
 import type { LoadEvent } from '@sveltejs/kit';
 
+export const prerender = true;
+
 export async function GET({ fetch }: LoadEvent) {
 	const response = await fetch('api/posts');
 	const posts: Post[] = await response.json();
