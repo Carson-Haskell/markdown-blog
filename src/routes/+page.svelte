@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as config from '$lib/config';
 	import { formatDate } from '$lib/utils.js';
+	import Counter from '../posts/counter.svelte';
 
 	export let data;
 </script>
