@@ -40,7 +40,7 @@ const config = {
 
 	kit: {
 		adapter: adapter({
-			runtime: 'node20'
+			runtime: 'node18'
 		})
 	}
 };
