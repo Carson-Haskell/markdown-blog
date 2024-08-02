@@ -29,7 +29,7 @@ const mdsvexOptions = {
 		}
 	},
 
-	remarkPlugins: [remarkUnwrapImages, remarkToc],
+	remarkPlugins: [remarkUnwrapImages, remarkToc, { tight: true }],
 	rehypePlugins: [rehypeSlug]
 };
 
