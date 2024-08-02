@@ -1,7 +1,7 @@
 ---
 title: Second post
 description: Second post.
-date: '2024/06/23'
+date: '2024/06/28'
 categories:
   - sveltekit
   - svelte
@@ -11,6 +11,8 @@ published: true
 <script>
   import Counter from './counter.svelte';
 </script>
+
+## Table of Contents
 
 ## Svelte
 
