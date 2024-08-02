@@ -103,4 +103,4 @@ export const load: Load = async ({ params }) => {
 
 ---
 
-## Live Preview: [View Project]('link')
+## Live Preview: [View Project]('https://markdown-blog-fg96pamjf-carson-haskells-projects.vercel.app')
